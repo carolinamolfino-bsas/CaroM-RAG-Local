@@ -1,0 +1,46 @@
+{
+  "fecha": "2026-11-20T17:50:07",
+  "llm": {
+    "proveedor": "openai",
+    "modelo": "qwen2.5:7b",
+    "base_url": "http://localhost:11434/v1"
+  },
+  "embeddings": "ollama:bge-m3",
+  "chunking": {
+    "chunk_size": 500,
+    "chunk_overlap": 50
+  },
+  "top_k": 4,
+  "pruebas": [
+    {
+      "nombre": "Respuesta en los documentos",
+      "comportamiento_esperado": true,
+      "resultado": {
+        "pregunta": "¿Cuál es el tiempo máximo de respuesta de la guardia ante un incidente SEV1?",
+        "respuesta": "El tiempo máximo de respuesta de la guardia ante un incidente SEV1 es **10 minutos** desde la alerta.",
+        "encontrada": true,
+        "referencias": [
+          {
+            "fragmento": 1,
+            "fuente": "02_gestion_de_incidentes.md",
+            "seccion": "Niveles de severidad",
+            "relevancia": 0.709,
+            "extracto": "## Niveles de severidad ### SEV1: crítico Un SEV1 es una caída total de los cobros, una pérdida o corrupción de datos del Ledger, o una exposición de datos de t"
+          }
+        ],
+        "avisos": []
+      }
+    },
+    {
+      "nombre": "Pregunta trampa (no está en los documentos)",
+      "comportamiento_esperado": true,
+      "resultado": {
+        "pregunta": "¿Cuál es el presupuesto anual de infraestructura de Kaleido Pagos?",
+        "respuesta": "No lo sé. Esa información no está en los documentos disponibles.",
+        "encontrada": false,
+        "referencias": [],
+        "avisos": []
+      }
+    }
+  ]
+}
