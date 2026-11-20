@@ -25,6 +25,7 @@ CaroM-RAG-Local/
 ├── ingest.py                # 1. Ingesta: carga, chunking por tokens y persistencia en ChromaDB
 ├── rag.py                   # 2 y 3. Retriever + cadena LCEL + get_rag_response() asíncrona
 ├── main.py                  # Prueba End-to-End: pregunta con respuesta + pregunta trampa
+├── ejemplos/ejecucion_ollama.json   # Registro de la corrida real con Ollama (bge-m3 + qwen2.5:7b)
 ├── config.py                # Configuración validada con Pydantic (.env)
 ├── llm.py                   # ChatOpenAI / ChatAnthropic / Ollama (reutiliza el Módulo 1)
 ├── tests/                   # 25 tests offline + servidor HTTP que imita a Ollama
@@ -125,7 +126,7 @@ for ref in r.referencias:
 ```json
 {
   "pregunta": "¿Cuál es el tiempo máximo de respuesta de la guardia ante un incidente SEV1?",
-  "respuesta": "La guardia tiene 10 minutos desde la alerta.",
+  "respuesta": "El tiempo máximo de respuesta de la guardia ante un incidente SEV1 es **10 minutos** desde la alerta.",
   "encontrada": true,
   "referencias": [
     {"fragmento": 1, "fuente": "02_gestion_de_incidentes.md", "seccion": "Niveles de severidad",
@@ -135,7 +136,7 @@ for ref in r.referencias:
 }
 ```
 
-> Ejemplo ilustrativo del formato. La relevancia y la redacción dependen del modelo.
+> Respuesta y relevancia reales de la corrida con Ollama (`qwen2.5:7b` + `bge-m3`); el extracto está acortado. El registro completo está en [`ejemplos/ejecucion_ollama.json`](ejemplos/ejecucion_ollama.json).
 
 ### 4. Tests y controles de calidad
 
@@ -204,8 +205,32 @@ RunnableParallel(pregunta=RunnablePassthrough(), fragmentos=retriever)
 
 ## Validación
 
-**Alcance:** los 25 tests corren sin red ni modelos. Incluyen ChromaDB real y un End-to-End de `main.py` con llamadas HTTP reales a un servidor que imita la API de Ollama, con embeddings determinísticos y respuestas simuladas.
+**Ejecución real (20/11/2026).** Se corrió en Windows 11 con Python 3.12.10, Ollama 0.40.16, embeddings `bge-m3` y LLM `qwen2.5:7b`, todo local y sin API keys:
 
-**Limitación:** no se ejecutó con modelos reales (Ollama `bge-m3` + `qwen2.5:7b`) al momento de la entrega. Con `python main.py --guardar ejemplos/ejecucion_ollama.json` queda registrada una corrida real.
+```
+Índice: 13 fragmentos de 4 documentos (no existía el índice).
+LLM: openai/qwen2.5:7b · embeddings: ollama:bge-m3 · top_k=4
+
+Respuesta en los documentos
+Pregunta: ¿Cuál es el tiempo máximo de respuesta de la guardia ante un incidente SEV1?
+Respuesta: El tiempo máximo de respuesta de la guardia ante un incidente SEV1 es **10 minutos** desde la alerta.
+  [1] 02_gestion_de_incidentes.md · Niveles de severidad · relevancia 0.71
+✔ Respondió con el dato correcto y citó la fuente.
+
+Pregunta trampa (no está en los documentos)
+Pregunta: ¿Cuál es el presupuesto anual de infraestructura de Kaleido Pagos?
+Respuesta: No lo sé. Esa información no está en los documentos disponibles.
+✔ No alucinó: respondió 'No lo sé'.
+
+Resumen: 2/2 pruebas con el comportamiento esperado.
+```
+
+- El fragmento correcto quedó **primero** en la búsqueda (relevancia 0,71), y el modelo citó solo esa fuente.
+- Ante la pregunta trampa, el modelo no inventó un presupuesto: respondió "No lo sé" y no dio referencias.
+- El registro completo, con las referencias y los extractos, está en [`ejemplos/ejecucion_ollama.json`](ejemplos/ejecucion_ollama.json).
+
+**Tests automáticos.** Los 25 tests corren sin red ni modelos, así que también pasan en GitHub Actions. Incluyen ChromaDB real y un End-to-End de `main.py` con llamadas HTTP reales a un servidor que imita la API de Ollama, con embeddings determinísticos y respuestas simuladas.
+
+**Alcance.** La corrida real valida las dos pruebas de la consigna con un modelo local de 7B parámetros. Un modelo más grande, como GPT-4o, puede dar respuestas mejor redactadas, pero el comportamiento que se verifica es el mismo: responder solo con el contexto y decir "No lo sé" cuando no está.
 
 [Ollama]: https://ollama.com
