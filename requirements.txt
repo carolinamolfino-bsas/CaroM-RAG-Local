@@ -1,0 +1,16 @@
+# Cliente del Módulo 1 (repo CaroM-LLM-Client): configuración del LLM, reutilizada como librería
+carom-llm-client @ git+https://github.com/carolinamolfino-bsas/CaroM-LLM-Client.git@v1.2.0
+
+# LangChain (modular: núcleo + integraciones)
+langchain-core>=1.7,<2
+langchain-text-splitters>=1.1,<2
+langchain-chroma>=1.1,<2
+langchain-ollama>=1.1,<2
+langchain-openai>=1.7,<2
+langchain-anthropic>=1.7,<2
+
+# Base vectorial, tokenizador y utilidades
+chromadb>=1.5,<2
+tiktoken>=0.12,<1
+pydantic>=2.11,<3
+python-dotenv>=1.0,<2

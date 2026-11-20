@@ -1,0 +1,28 @@
+# Configuración de herramientas (el proyecto se instala con requirements.txt).
+[project]
+name = "carom-rag-local"
+version = "1.0.0"
+description = "CaroM - Pre-entrega 3: Sistema de recuperación semántica local (RAG) con ChromaDB y LangChain"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "ASYNC"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "ingest", "llm", "rag", "main", "tests"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["config.py", "ingest.py", "llm.py", "rag.py", "main.py"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+check_untyped_defs = true
